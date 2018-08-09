@@ -21,8 +21,8 @@ class Upgrade: SKShapeNode {
 		super.init()
 	}
 	
-	init(rectOf: CGSize) {
-		super.init(rectOf: rectOf)
+	convenience init(rectOf: CGSize) {
+		self.init(rectOf: rectOf)
 	}
 	
 	required init?(coder aDecoder: NSCoder) {
