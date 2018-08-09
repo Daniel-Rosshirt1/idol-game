@@ -21,8 +21,8 @@ class Upgrade: SKShapeNode {
 		super.init()
 	}
 	
-	init(rectOf: CGSize) {
-		super.init(rectOf: rectOf)
+	convenience init(rectOf: CGSize) {
+		self.init(rectOf: rectOf)
 	}
 	
 	required init?(coder aDecoder: NSCoder) {
@@ -176,4 +176,5 @@ class GameScene: SKScene {
 			rateLabel.text = String((Double(self.increment) / Double(self.interval)))
 		}
     }
+    @IBOutlet weak var num_go_up_button: UIButton!
 }
