@@ -9,16 +9,54 @@
 import SpriteKit
 import GameplayKit
 
+
+// https://blog.kongregate.com/the-math-of-idle-games-part-i/
+class Upgrade: SKShapeNode {
+	private var basePrice : UInt32 = 1
+	private var qty : UInt32 = 0
+	private var locked : Bool = true
+	private var baseProd : UInt32 = 0 // Amount of production
+	
+	override init() {
+		super.init()
+	}
+	
+	init(rectOf: CGSize) {
+		super.init(rectOf: rectOf)
+	}
+	
+	required init?(coder aDecoder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+	
+	func getPrice() -> UInt32 {
+		return UInt32(pow(Double(self.basePrice), Double(self.qty)))
+		
+	}
+	
+	func getNumber() -> UInt32 {
+		return self.baseProd * self.qty
+	}
+}
+
 class GameScene: SKScene {
     
 //    private var label : SKLabelNode?
 //    private var spinnyNode : SKShapeNode?
 	private var numberLabel : SKLabelNode?
-	private var myNumber : UInt64 = UINT64_MAX
+	private var button1 : SKShapeNode?
+	private var rateLabel : SKLabelNode?
+	
+	private var myNumber : UInt64 = 0
+	private var interval : TimeInterval = 0.2
+	private var increment : UInt32 = 1
+
     
     override func didMove(to view: SKView) {
 		
 		self.numberLabel = self.childNode(withName: "//MyNumber") as? SKLabelNode
+		self.button1 = self.childNode(withName: "//button1") as? SKShapeNode
+		self.rateLabel = self.childNode(withName: "//MyRate") as? SKLabelNode
 		
 		if let label = self.numberLabel {
 			label.text = String(self.myNumber)
@@ -62,13 +100,14 @@ class GameScene: SKScene {
 //        }
 //    }
 //
-//    func touchUp(atPoint pos : CGPoint) {
+    func touchUp(atPoint pos : CGPoint) {
+//		if let n = self
 //        if let n = self.spinnyNode?.copy() as! SKShapeNode? {
 //            n.position = pos
 //            n.strokeColor = SKColor.red
 //            self.addChild(n)
 //        }
-//    }
+    }
 //
 //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        if let label = self.label {
@@ -82,9 +121,37 @@ class GameScene: SKScene {
 //        for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
 //    }
 //
-//    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+		let pos = touches.first?.location(in: self)
+
+		if let button1 = self.button1 {
+			let touchedNode = button1.atPoint(pos!)
+			if let name = touchedNode.name {
+				if name == "button1" {
+					if let label = self.numberLabel {
+						label.text = "helo"
+						if self.myNumber > 100 {
+							self.myNumber -= 100
+							self.increment += 1
+						}
+					}
+				}
+			}
+		}
+		
+//		let touch:UITouch = touches.anyObject()! as UITouch
+//		let positionInScene = touch.locationInNode(self)
+//		let touchedNode = self.nodeAtPoint(positionInScene)
+//
+//		if let name = touchedNode.name
+//		{
+//			if name == "button1"
+//			{
+//				print("Touched")
+//			}
+//		}
 //        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-//    }
+    }
 //
 //    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
 //        for t in touches { self.touchUp(atPoint: t.location(in: self)) }
@@ -93,6 +160,20 @@ class GameScene: SKScene {
 	private var lastTime : TimeInterval?
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+		if let lastTime = self.lastTime {
+			if (currentTime - lastTime >= self.interval) {
+				self.myNumber += UInt64(self.increment)
+				self.lastTime = lastTime + self.interval
+			}
+		} else {
+			self.lastTime = currentTime
+		}
+		if let label = self.numberLabel {
+			label.text = String(self.myNumber)
+		}
 		
+		if let rateLabel = self.rateLabel {
+			rateLabel.text = String((Double(self.increment) / Double(self.interval)))
+		}
     }
 }
